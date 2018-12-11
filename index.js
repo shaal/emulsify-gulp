@@ -63,7 +63,7 @@ module.exports = (gulp, config) => {
         imagemin([
           imagemin.jpegtran({ progressive: true }),
           imagemin.svgo({
-            plugins: [{ removeViewBox: false }, { cleanupIDs: false }],
+            plugins: [{ removeViewBox: false }, { cleanupIDs: false }, { removeTitle: false }],
           }),
         ])
       )
@@ -103,6 +103,7 @@ module.exports = (gulp, config) => {
         open: config.browserSync.openBrowserAtStart,
         proxy: config.browserSync.domain,
         startPath: config.browserSync.startPath,
+        ghostMode: config.browserSync.ghostMode
       });
     } else {
       browserSync.init({
@@ -116,6 +117,7 @@ module.exports = (gulp, config) => {
         open: config.browserSync.openBrowserAtStart,
         reloadOnRestart: config.browserSync.reloadOnRestart,
         port: openPort,
+        ghostMode: config.browserSync.ghostMode
       });
     }
     gulp.watch(config.paths.js, ['scripts']);
@@ -144,25 +146,34 @@ module.exports = (gulp, config) => {
   /**
    * Deploy
    */
-  gulp.task('ghpages-deploy', () => {
-    // Create build directory.
+  gulp.task('createBuild', () => {
     gulp
       .src(
         [
           `${config.paths.dist_js}/**/*`,
           `${config.paths.pattern_lab}/**/*`,
+          `${config.paths.theme_images}/**/*`,
+          `!${config.paths.theme_images}/{icons,icons/**/*}`,
+          `${config.paths.logo}`,
           `${config.themeDir}/CNAME`,
         ],
         { base: config.themeDir }
       )
       .pipe(gulp.dest('build'));
+  });
+
+  gulp.task('githubPublish', () => {
     // Publish the build directory to github pages.
     ghpages.publish(`${config.themeDir}build`, (err) => {
       if (err === undefined) {
+        // eslint-disable-next-line no-console
         console.log('Successfully deployed!');
       } else {
+        // eslint-disable-next-line no-console
         console.log(err);
       }
     });
   });
+
+  gulp.task('ghpages-deploy', ['createBuild', 'githubPublish']);
 };

@@ -13,6 +13,8 @@
     ],
     dist_css: `${themeDir}/dist/css`,
     pattern_lab: `${themeDir}/pattern-lab/public`,
+    theme_images: `${themeDir}/images`,
+    logo: `${themeDir}/logo.png`,
   };
 
   module.exports = {
@@ -77,6 +79,14 @@
       openBrowserAtStart: false,
       reloadOnRestart: true,
       ui: false,
+      // Clicks, Scrolls & Form inputs on any device will be mirrored to all others.
+      // ghostMode: false to turn all off
+      ghostMode: {
+        clicks: true,
+        forms: true,
+        scroll: true,
+        location: true
+      }
     },
     wpt: {
       // WebPageTest API key https://www.webpagetest.org/getkey.php
